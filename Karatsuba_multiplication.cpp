@@ -88,6 +88,8 @@ vector<int> operator+(vector<int>& v1, vector<int>& v2)
     return result;
     
 }
+
+//only valid for v1 >= v2
 vector<int> operator-(const vector<int>& v1, const vector<int>& v2)
 {
     auto p1 = v1.rbegin();
@@ -130,21 +132,17 @@ vector<int> operator-(const vector<int>& v1, const vector<int>& v2)
     }
     
     if (borrow){
-        while(!borrow){
-            if(*p1 == 0){
-                result.insert(result.begin(), 9);
-                borrow = 1;
-            }
-            else{
-                int num = *p1;
-                result.insert(result.begin(), --num);
-                borrow = 0;
-            }
-            
-            p1++;
+        if(*p1 == 0){
+            result.insert(result.begin(), 9);
+            borrow = 1;
+        }
+        else{
+            int num = *p1;
+            result.insert(result.begin(), --num);
+            borrow = 0;
         }
     }
-    
+
     return result;
 }
 
@@ -165,7 +163,7 @@ int main(int argc, const char * argv[]) {
         display(number1);
         display(number2);
         
-        vector<int> diff = number1 - number2;
+        vector<int> diff = number1 - number2; //only valid for number1 >= number2
         display(diff);
         cout << endl;
     }
