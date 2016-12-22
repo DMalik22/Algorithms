@@ -43,7 +43,8 @@ int optimal_weight(int Capacity, const vector<int> &weight_of_gold_bar){
 //      std::cout << value[ith_goldbar][weight] << "\t";
     }
 //    std::cout << "\n";
-  }  return value[weight_of_gold_bar.size()][Capacity];
+  }  
+  return value[weight_of_gold_bar.size()][Capacity];
 }
 
 
