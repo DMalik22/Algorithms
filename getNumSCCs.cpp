@@ -4,12 +4,12 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-#include <stack>
+#include <list>
 
 using std::vector;
-using std::stack;
+using std::list;
 
-void Explore_SCC(int v, vector<vector<int> > &adj, vector<bool> &visited, stack<int> &Order){
+void Explore_SCC(int v, vector<vector<int> > &adj, vector<bool> &visited, list<int> &Order){
   visited[v] = true;
   
   for(int i = 0; i < adj[v].size(); i++){
@@ -20,20 +20,19 @@ void Explore_SCC(int v, vector<vector<int> > &adj, vector<bool> &visited, stack<
   }
 }
 
-void dfs_SCC(vector<vector<int> > &G, stack<int> &Order, int &numSCCs){
+void dfs_SCC(vector<vector<int> > &G, list<int> &order, int &numSCCs){
   vector<bool> visited(G.size(), false);
-  while(!Order.empty()){
-    int v = Order.top();
-    Order.pop();
-    
+  
+  for(list<int>::const_iterator iterator = order.begin(), end = order.end(); iterator != end; ++iterator){
+    int v = *iterator;
     if(!visited[v]){
       numSCCs++;
-      Explore_SCC(v, G, visited, Order);
+      Explore_SCC(v, G, visited, order);
     }
   }
 }
 
-void Explore(int v, vector<vector<int> > &adj, bool * visited, stack<int> &Order){
+void Explore(int v, vector<vector<int> > &adj, vector<bool> &visited, list<int> &Order){
   visited[v] = true;
   for(int i = 0; i < adj[v].size(); i++){
     int w = adj[v][i];
@@ -41,11 +40,11 @@ void Explore(int v, vector<vector<int> > &adj, bool * visited, stack<int> &Order
       Explore(w, adj, visited, Order);
     }
   }
-  Order.push(v);
+  Order.push_front(v);
 }
 
-void dfs(vector<vector<int> > &adj, stack<int> &Order){
-  bool * visited = new bool[adj.size()];
+void dfs(vector<vector<int> > &adj, list<int> &Order){
+  vector<bool> visited(adj.size(), false);
   for(int i = 0; i < adj.size(); i++){
     if(visited[i] == false){
       Explore(i, adj, visited, Order);
@@ -66,7 +65,7 @@ vector<vector<int> > getGraphTraspose(vector<vector<int> > &G){
 }
 
 void SCC(vector<vector<int> > &Graph, int &numSCCs){
-  stack<int> order;
+  list<int> order;
   
   dfs(Graph, order);
   
