@@ -1,41 +1,37 @@
 /*
- Improved earlier implementation by using a stack, thus, making it vastly simpler. Right now, gives wrong output for a few test cases.
- */
-
+ Implemented Topological sort exactly as explained in CLRS.
+ Works perfectly for all test cases now.
+*/
 #include <iostream>
 #include <algorithm>
 #include <vector>
-#include <stack>
+#include <list>
 
 using std::vector;
-using std::stack;
+using std::list;
 
-void postvisit(int v, int &clock, vector<int> &postvisit_order){
-  postvisit_order[v] = ++clock;
-}
-
-void Explore(int v, vector<vector<int> > &adj, bool * visited, stack<int> &Order){
+void dfs_vist(int v, vector<vector<int> > &adj, bool * visited, list<int> &Order){
   visited[v] = true;
   for(int i = 0; i < adj[v].size(); i++){
     int w = adj[v][i];
     if(visited[w] == false){
-      Explore(w, adj, visited, Order);
+      dfs_vist(w, adj, visited, Order);
     }
   }
-  Order.push(v);
+  Order.push_front(v);
 }
 
-void dfs(vector<vector<int> > &adj, stack<int> &Order){
+void dfs(vector<vector<int> > &adj, list<int> &Order){
   bool * visited = new bool[adj.size()];
   for(int i = 0; i < adj.size(); i++){
     if(visited[i] == false){
-      Explore(i, adj, visited, Order);
+      dfs_vist(i, adj, visited, Order);
     }
   }
 }
 
-stack<int> toposort(vector<vector<int> > adj) {
-  stack<int> order;
+list<int> toposort(vector<vector<int> > adj) {
+  list<int> order;
   dfs(adj, order);
   return order;
 }
@@ -49,9 +45,11 @@ int main() {
     std::cin >> x >> y;
     adj[x - 1].push_back(y - 1);
   }
-  stack<int> order = toposort(adj);
-  while(!order.empty()){
-    std::cout << order.top() + 1 << " ";
-    order.pop();
+  
+  list<int> order = toposort(adj);
+  
+  for(list<int>::const_iterator iterator = order.begin(), end = order.end(); iterator != end; ++iterator){
+    std::cout << *iterator + 1 << " ";
   }
+  std::cout << std::endl;
 }
