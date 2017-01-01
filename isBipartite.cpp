@@ -1,5 +1,5 @@
 /*
- Used BFS to determine if graph is bipartite. Failing one test case. Otherwise works fine.
+ Used BFS to determine if graph is bipartite.
  */
 
 #include <iostream>
@@ -12,9 +12,12 @@ using std::queue;
 int is_bipartite(vector<vector<int> > &adj) {
   vector <int> color (adj.size(), -1); // -1 represents no color
   int s = adj[0][0]; //arbitrarilty choosing this as a source vertex
+  
   color[s] = 0; //let 0 represent white and 1 black
+  
   queue<int> Q;
   Q.push(s);
+  
   while(!Q.empty()){
     int u = Q.front();
     Q.pop();
@@ -28,6 +31,7 @@ int is_bipartite(vector<vector<int> > &adj) {
         if(color[u] == 0) color[v] = 1;
         if(color[u] == 1) color[v] = 0;
       }
+      
       //else check if v and its ancestor have same color
       //if this is the case then the graph is not bipartite
       else{
