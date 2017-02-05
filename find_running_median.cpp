@@ -1,4 +1,4 @@
-//A naive approach to find the running median problem
+//Used C++ STL priority queues
 /*
  Given an input stream of n integers, you must perform the following task for each  integer:
  
@@ -34,101 +34,96 @@
  5.0
  6.0
  */
-
+#include <iostream>
 #include <iomanip>
 #include <vector>
-#include <iostream>
 #include <algorithm>
+#include <queue>
 
 using namespace std;
 
 /*
-As implemented in CLRS 
-https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-006-introduction-to-algorithms-fall-2011/lecture-videos/MIT6_006F11_lec04.pdf
-*/
+ Figured out the efficient approach here:
+ https://www.youtube.com/watch?v=VmogG01IjYc
+ http://en.cppreference.com/w/cpp/container/priority_queue
+ */
 
-class Heap {
-    //heap implemented as a tree using a (1 based index) array to store nodes 
-    vector <int> A;
-
-    //returns index of node's parent
-    int parent(int i){
-        return i / 2;
-    }
-    
-    //returns index of node's left child
-    int left(int i){
-        return 2*i;
-    }
-    
-    //returns index of node's right child
-    int right(int i){
-        return 2*i+ 1;
-    }
-    
-    //correct a single violation of the heap property in a subtree at its root
-    void min_heapify(int i){
-        int l = left(i);
-        int r = right(i);
-        int smallest;
-        
-        if(l <= A.size() - 1 && A[l] < A[i])
-            smallest = l;
-        else
-            smallest = i;
-        
-        if(r <= A.size() - 1 && A[r] < A[smallest])
-            smallest = r;
-        
-        if(smallest != i){
-            iter_swap(A.begin() + i, A.begin() + smallest);
-            min_heapify(smallest);
-        }
-    }
-    
-    
-    //produce a max-heap from an unordered array
-    void build_min_heap(){
-        int n = A.size() - 1;
-        for(int i = n /2; i >= 1; i++)
-            min_heapify(i);
-    }
-    
-    public:
-    Heap(){
-        A.push_back(0);
-    }
-    
-    //insert new element at end of vector and build min heap
-    void insert(int i){
-        A.push_back(i);
-        build_min_heap();
-    }
-    
-    float return_median(){
-    int n = A.size() - 1;
-    if (n%2 == 0)
-        return((((A[n / 2] + A[(n / 2) + 1]) / 2) * 10) / 10) ;
+class Solution {
+  void addNumber(int number,
+                 priority_queue<int> &lowers,
+                 priority_queue<int, vector<int>, greater<int> > &highers){
+    if (lowers.size() == 0 || number < lowers.top())
+      lowers.push(number);
     else
-        return((A[(n / 2) + 1] * 10) / 10);
+      highers.push(number);
+  }
+  
+  void rebalance(priority_queue<int> &lowers,
+                 priority_queue<int, vector<int>, greater<int> > &highers){
+    int bigger_arg = lowers.size() > highers.size() ? 1 : 2;
+    
+    if(bigger_arg == 1){
+      if(lowers.size() - highers.size() > 1){
+        highers.push(lowers.top());
+        lowers.pop();
+      }
     }
+    else{
+      if(highers.size() - lowers.size() > 1){
+        lowers.push(highers.top());
+        highers.pop();
+      }
+    }
+  }
+  
+  double getMedian(priority_queue<int> &lowers,
+                   priority_queue<int, vector<int>, greater<int> > &highers){
+    if(highers.size() == 0) return lowers.top();
+    if(lowers.size() == highers.size()){
+      return (((double) (lowers.top() + highers.top())) / 2);
+    }
+    else{
+      int bigger_arg = lowers.size() > highers.size() ? 0 : 1;
+      if(bigger_arg == 0)
+        return lowers.top();
+      else
+        return highers.top();
+    }
+  }
+  
+public:
+  vector<double> return_Medians(vector<int> &a){
+    priority_queue<int> lowers;
+    priority_queue<int, vector<int>, greater<int> > highers;
+    vector <double> medians;
+    
+    int length = a.size();
+    for(int i = 0; i < length; i++){
+      int num = a[i];
+      addNumber(num, lowers, highers);
+      rebalance(lowers, highers);
+      medians.push_back(getMedian(lowers, highers));
+    }
+    return medians;
+  }
 };
 
+
+
+
+
 int main(){
-    int n;
-    cin >> n;
-    int val;
-    float median;
-    Heap * A = new Heap();
-    for(int i = 0;i < n;i++){
-       cin >> val;
-       A->insert(val);
-       median = A->return_median();
-       cout << median << setprecision(1) << endl;
-    }
-    
-    
-    return 0;
+  int n;
+  cin >> n;
+  vector<int> a(n);
+  for(int a_i = 0;a_i < n;a_i++){
+    cin >> a[a_i];
+  }
+  cout << fixed << setprecision(1);
+  Solution running_medians;
+  vector<double> medians = running_medians.return_Medians(a);
+  for(int m_i = 0;m_i < n;m_i++)
+    cout << medians[m_i] << endl;
+  
+  return 0;
 }
-
-
