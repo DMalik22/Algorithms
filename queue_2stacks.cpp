@@ -42,34 +42,30 @@
 using namespace std;
 
 class MyQueue {
+    stack<int> stack_newest_on_top, stack_oldest_on_top;
   
+  void shiftStacks(){
+    if(stack_oldest_on_top.empty()){
+      while(!stack_newest_on_top.empty()){
+        stack_oldest_on_top.push(stack_newest_on_top.top());
+      stack_newest_on_top.pop();
+      }
+    }
+  }
     public:
-        stack<int> stack_newest_on_top, stack_oldest_on_top;   
-        void push(int x) {
-            if(stack_oldest_on_top.empty()){
-                stack_newest_on_top.push(x);
-            while(!stack_newest_on_top.empty()){
-                stack_oldest_on_top.push(stack_newest_on_top.top());
-                stack_newest_on_top.pop();
-            }
-            }
-            else{
-            while(!stack_oldest_on_top.empty()){
-                stack_newest_on_top.push(stack_oldest_on_top.top());
-                stack_oldest_on_top.pop();
-            }
-            push(x);
-            }
-            
+  
+        void enqueue(int x) {
+          stack_newest_on_top.push(x);
         }
 
-        void pop() {
-            if(stack_oldest_on_top.size() > 0)
+        void dequeue() {
+          shiftStacks();
             stack_oldest_on_top.pop();
         }
 
         int front() {
-            return stack_oldest_on_top.top();
+          shiftStacks();
+          return stack_oldest_on_top.top();
         }
         
 };
@@ -83,10 +79,10 @@ int main() {
         cin >> type;
         if(type == 1) {
             cin >> x;
-            q1.push(x);
+            q1.enqueue(x);
         }
         else if(type == 2) {
-            q1.pop();
+            q1.dequeue();
         }
         else cout << q1.front() << endl;
     }
